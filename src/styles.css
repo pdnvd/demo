@@ -176,3 +176,18 @@ body:after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;op
   background:radial-gradient(circle at 34% 26%,
     #ffffff 0 5%, #f0eee6 16%, #b9bcf0 38%, #4b53dd 62%, #21268f 82%, rgba(33,38,143,0) 94%);
   box-shadow:0 46px 56px -28px rgba(20,18,78,.45)}
+
+
+/* ---- FIX 3: devolver los sujetos CSS que se ocultaron al meter Three.js ---- */
+/* La linea ".chrome-object,.ball,.watchman{display:none}" los apago en su dia. */
+/* Sin 3D, esas tres cards se quedaban sin protagonista. */
+.chrome-object,.ball,.watchman{display:block}
+
+/* Ahora que vuelven, se integran con la luz del aura */
+.chrome-object{box-shadow:22px 34px 48px rgba(120,28,6,.55), 0 0 0 1px rgba(255,255,255,.06)}
+.ball{box-shadow:12px 34px 46px rgba(4,10,51,.45)}
+.watchman{filter:drop-shadow(8px 8px 0 rgba(255,44,121,.22)) drop-shadow(0 18px 24px rgba(0,0,0,.35))}
+
+/* El titular gigante deja de comerse al objeto */
+.art-word{color:#150502;opacity:.92}
+.un-word{text-shadow:0 18px 40px rgba(3,8,40,.35)}
