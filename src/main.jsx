@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import * as THREE from 'three'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './styles.css'
@@ -80,13 +79,13 @@ function useScrollExperience() {
       gsap.utils.toArray('.project-card').forEach((card, i) => {
         gsap.from(card, { y: 130, opacity: 0, rotate: i % 2 ? 1.8 : -1.8, duration: 1.15, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' } })
         gsap.fromTo(card.querySelector('.art'), { clipPath: 'inset(9% 7% 9% 7%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'center center', scrub: .8 } })
-        gsap.to(card.querySelector('.scene-canvas'), { yPercent: i % 2 ? -8 : 8, rotate: i % 2 ? -2 : 2, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: 1 } })
+        gsap.to(card.querySelector('.aura'), { yPercent: i % 2 ? -8 : 8, rotate: i % 2 ? -2 : 2, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: 1 } })
       })
 
       gsap.fromTo('.manifesto > p', { scale: .74, rotate: -2, opacity: .25 }, { scale: 1, rotate: 0, opacity: 1, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'center center', scrub: 1 } })
       gsap.from('.agency-title span:first-child', { xPercent: -25, opacity: 0, scrollTrigger: { trigger: '.agency-title', start: 'top 85%', end: 'top 45%', scrub: 1 } })
       gsap.from('.agency-title span:last-child', { xPercent: 25, opacity: 0, scrollTrigger: { trigger: '.agency-title', start: 'top 85%', end: 'top 45%', scrub: 1 } })
-      gsap.to('.agency-3d .scene-canvas', { scale: 1.3, rotate: 12, scrollTrigger: { trigger: '.agency-3d', start: 'top bottom', end: 'bottom top', scrub: 1 } })
+      gsap.to('.agency-3d .aura', { scale: 1.3, rotate: 12, scrollTrigger: { trigger: '.agency-3d', start: 'top bottom', end: 'bottom top', scrub: 1 } })
       gsap.from('.services > div', { xPercent: -8, opacity: 0, stagger: .08, scrollTrigger: { trigger: '.services', start: 'top 82%' } })
       gsap.from('.contact > a span:first-child', { xPercent: -18, opacity: 0, scrollTrigger: { trigger: '.contact', start: 'top 70%', end: 'center center', scrub: 1 } })
       gsap.from('.contact > a span:last-child', { xPercent: 18, opacity: 0, scrollTrigger: { trigger: '.contact', start: 'top 70%', end: 'center center', scrub: 1 } })
@@ -95,92 +94,8 @@ function useScrollExperience() {
   }, [])
 }
 
-function Scene3D({ variant = 'hero' }) {
-  const canvasRef = useRef(null)
-  useEffect(() => {
-    const canvas = canvasRef.current
-    const scene = new THREE.Scene()
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.65))
-    renderer.outputColorSpace = THREE.SRGBColorSpace
-    renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.25
-    const camera = new THREE.PerspectiveCamera(34, 1, .1, 100)
-    camera.position.set(0, 0, variant === 'hero' ? 9 : 7)
-    const group = new THREE.Group()
-    scene.add(group)
-    const pointer = new THREE.Vector2()
-    let frame, visible = true
-
-    const metal = (color, roughness=.15, metalness=.86) => new THREE.MeshPhysicalMaterial({ color, metalness, roughness, clearcoat: 1, clearcoatRoughness: .12 })
-    const glass = new THREE.MeshPhysicalMaterial({ color: 0xd5ddff, metalness: .05, roughness: .05, transmission: .72, thickness: 1.4, transparent: true, opacity: .92 })
-
-    const addMesh = (geometry, material, position=[0,0,0], rotation=[0,0,0], scale=[1,1,1]) => {
-      const mesh = new THREE.Mesh(geometry, material)
-      mesh.position.set(...position); mesh.rotation.set(...rotation); mesh.scale.set(...scale); group.add(mesh); return mesh
-    }
-
-    if (variant === 'hero') {
-      const core = addMesh(new THREE.TorusKnotGeometry(1.65, .52, 220, 32, 2, 3), metal(0x303bd9, .1), [0,0,0], [.45,.2,.05], [1.08,1.08,1.08])
-      core.userData.spin = [.0018,.003]
-      addMesh(new THREE.TorusGeometry(2.45, .045, 12, 160), metal(0xf2ff54,.08), [0,0,0], [1.12,.1,.18])
-      addMesh(new THREE.TorusGeometry(2.12, .025, 10, 160), metal(0xffffff,.12), [0,0,0], [.15,1.35,.5])
-      const beadGeo = new THREE.IcosahedronGeometry(.16, 2)
-      for(let i=0;i<15;i++){
-        const a=i/15*Math.PI*2
-        addMesh(beadGeo, i%4===0?metal(0xf2ff54,.08):glass, [Math.cos(a)*2.35,Math.sin(a)*1.45,Math.sin(a*3)*.85])
-      }
-    } else if (variant === 'forma') {
-      const head = addMesh(new THREE.IcosahedronGeometry(1.55, 5), metal(0x111111,.06), [0,.18,0], [0,.55,-.12], [.86,1.15,.8])
-      const cavity = addMesh(new THREE.TorusGeometry(.63,.16,24,80), metal(0xff4d13,.22,.5), [.15,.22,1.08], [0,0,.08], [1,.72,1])
-      head.userData.spin=[0,.002]
-      addMesh(new THREE.CylinderGeometry(1.35,1.65,.45,6), metal(0x6f6f6f,.25), [0,-1.55,0])
-    } else if (variant === 'unfc') {
-      const ballMat = metal(0xe9e7df,.3,.15)
-      const ball = addMesh(new THREE.IcosahedronGeometry(1.65, 3), ballMat, [0,.15,0], [.3,.5,.2])
-      ball.userData.spin=[.002,.0035]
-      const wire = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(1.67,2)), new THREE.LineBasicMaterial({color:0x172354,transparent:true,opacity:.7}))
-      group.add(wire)
-      addMesh(new THREE.TorusGeometry(2.25,.035,8,120), metal(0xffffff,.2), [0,0,-.2], [1.35,0,.4])
-    } else if (variant === 'ynv') {
-      for(let i=0;i<5;i++) addMesh(new THREE.BoxGeometry(2.3,.56,.48), metal(i===2?0xf0a12e:0x151515,.18), [0,1.2-i*.62,(i%2)*.25-.15], [0,(i-2)*.1,(i%2?-.04:.04)])
-      addMesh(new THREE.TorusGeometry(1.75,.08,12,100), metal(0xf0a12e,.15), [0,0,0], [1.2,.2,.35])
-    } else {
-      addMesh(new THREE.CylinderGeometry(.75,1.2,2.7,7), metal(0x111a34,.2), [0,-.2,0])
-      addMesh(new THREE.CylinderGeometry(.9,.72,.25,48), metal(0x0a0d18,.2), [0,1.25,0])
-      addMesh(new THREE.SphereGeometry(.26,32,20), metal(0xffb24c,.06,.2), [.45,.72,1.02],[0,0,0],[1.8,.35,.25])
-      const lamp = addMesh(new THREE.BoxGeometry(.65,.85,.45), glass, [1.3,-.55,.2], [0,.15,0])
-      const point = new THREE.PointLight(0xffa541,25,5); point.position.copy(lamp.position); group.add(point)
-      for(let i=0;i<12;i++) addMesh(new THREE.BoxGeometry(.22,.22,.22), metal(0x1f2d56,.25), [-2.4+i*.42,-1.75, -1+(i%3)*.22], [0,i*.12,0], [1,1+i%4,1])
-    }
-
-    const key = new THREE.DirectionalLight(variant==='sereno'?0xffb24c:0xffffff, variant==='hero'?5:4.5); key.position.set(-3,4,5); scene.add(key)
-    const rim = new THREE.DirectionalLight(variant==='forma'?0xff4d13:variant==='unfc'?0x7697ff:0xf2ff54, 5); rim.position.set(4,-1,-2); scene.add(rim)
-    scene.add(new THREE.AmbientLight(0x6070aa,1.4))
-
-    const resize = () => {
-      const rect=canvas.getBoundingClientRect(); if(!rect.width||!rect.height)return
-      renderer.setSize(rect.width,rect.height,false); camera.aspect=rect.width/rect.height; camera.updateProjectionMatrix()
-    }
-    const move = e => {
-      const rect=canvas.getBoundingClientRect(); pointer.x=((e.clientX-rect.left)/rect.width-.5)*2; pointer.y=((e.clientY-rect.top)/rect.height-.5)*2
-    }
-    const observer = new IntersectionObserver(([entry]) => visible=entry.isIntersecting,{rootMargin:'100px'}); observer.observe(canvas)
-    const clock=new THREE.Clock()
-    const render=()=>{
-      frame=requestAnimationFrame(render); if(!visible)return
-      const time=clock.getElapsedTime(); group.rotation.y+=(pointer.x*.18-group.rotation.y)*.035; group.rotation.x+=(-pointer.y*.11-group.rotation.x)*.035
-      group.children.forEach((child,i)=>{if(child.userData.spin){child.rotation.x+=child.userData.spin[0];child.rotation.y+=child.userData.spin[1]} if(variant!=='hero'&&child.isMesh)child.position.y+=Math.sin(time*1.1+i)*.0008})
-      if(variant==='hero')group.position.y=Math.sin(time*.7)*.09
-      renderer.render(scene,camera)
-    }
-    resize(); render(); window.addEventListener('resize',resize); canvas.addEventListener('pointermove',move)
-    return () => {
-      cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener('resize',resize); canvas.removeEventListener('pointermove',move)
-      scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose())}});renderer.dispose()
-    }
-  }, [variant])
-  return <canvas className={`scene-canvas scene-${variant}`} ref={canvasRef} aria-label={`Escultura 3D ${variant}`} />
+function Aura({ variant }) {
+  return <div className={`aura aura-${variant}`} aria-hidden="true"><i /><i /><i /></div>
 }
 
 function Cursor() {
@@ -204,7 +119,7 @@ function Cursor() {
 function ProjectArt({ id }) {
   if (id === 'forma') return (
     <div className="art art-forma">
-      <Scene3D variant="forma" />
+      <Aura variant="forma" />
       <div className="hazard">OBJECT_004&nbsp;&nbsp; / &nbsp;&nbsp;DO NOT DUPLICATE</div>
       <div className="chrome-object"><span /></div>
       <div className="pedestal">FN<br/><small>1/1</small></div>
@@ -213,7 +128,7 @@ function ProjectArt({ id }) {
   )
   if (id === 'unfc') return (
     <div className="art art-unfc">
-      <Scene3D variant="unfc" />
+      <Aura variant="unfc" />
       <div className="pitch-lines" />
       <div className="ball"><i/><i/><i/></div>
       <div className="un-word">UN<br/>OFFICIAL</div>
@@ -222,7 +137,7 @@ function ProjectArt({ id }) {
   )
   if (id === 'ynv') return (
     <div className="art art-ynv">
-      <Scene3D variant="ynv" />
+      <Aura variant="ynv" />
       <div className="ynv-ticker">WORK IS CHANGING — KEEP MOVING — </div>
       <div className="ynv-type">YA<br/>NO<br/><span>VALES</span></div>
       <div className="ynv-bar" />
@@ -231,7 +146,7 @@ function ProjectArt({ id }) {
   )
   return (
     <div className="art art-sereno">
-      <Scene3D variant="sereno" />
+      <Aura variant="sereno" />
       <div className="moon" />
       <div className="city"><i/><i/><i/><i/><i/></div>
       <div className="watchman"><span className="hat"/><span className="head"/><span className="coat"/><span className="lamp"/></div>
@@ -304,7 +219,7 @@ function App() {
         <section className="hero">
           <div className="hero-kicker"><span>ONE-PERSON CREATIVE AGENCY</span><span>FILM + 3D + CULTURE</span></div>
           <h1><span>BUILDING</span><span>WORLDS</span><span>NOT <em>NOISE.</em></span></h1>
-          <div className="hero-object"><Scene3D variant="hero"/><span className="object-label">REAL-TIME SCULPTURE / 001</span></div>
+          <div className="hero-object"><Aura variant="hero"/><span className="object-label">LIGHT STUDY / 001</span></div>
           <p className="hero-intro">Concepto, diseño y movimiento para ideas que necesitan convertirse en <b>universos.</b></p>
           <a className="scroll-link" href="#work"><i/> SCROLL TO EXPLORE</a>
         </section>
@@ -328,7 +243,7 @@ function App() {
           <div className="section-head"><p>THE STUDIO</p><p>SMALL STRUCTURE / BIG OUTPUT</p></div>
           <div className="agency-title"><span>A CREATIVE AGENCY</span><span>BUILT AROUND <em>ONE</em> VISION.</span></div>
           <div className="agency-grid">
-            <div className="agency-3d"><Scene3D variant="forma"/><b>P/D</b><small>PERMANENTLY<br/>IN DEVELOPMENT</small></div>
+            <div className="agency-3d"><Aura variant="agency"/><b>P/D</b><small>PERMANENTLY<br/>IN DEVELOPMENT</small></div>
             <div className="agency-copy"><p>P.DNVD funciona como una agencia creativa independiente: una dirección clara y una red de colaboradores que escala según cada proyecto.</p><p>Sin capas innecesarias. Del concepto a la pieza final sin perder la intención por el camino.</p></div>
             <ol><li><span>01</span>DISCOVER<br/><small>Context, tension, opportunity.</small></li><li><span>02</span>DEFINE<br/><small>One sharp creative territory.</small></li><li><span>03</span>BUILD<br/><small>Identity, image, motion, world.</small></li></ol>
           </div>

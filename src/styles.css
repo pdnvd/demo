@@ -40,13 +40,13 @@ footer{height:64px;background:#111;color:#eee;padding:0 28px;display:flex;align-
 .logo sup{font:6px 'DM Mono';vertical-align:top;margin-left:4px;letter-spacing:0}
 .hero-kicker{width:38%}
 .hero-object{width:min(49vw,750px);left:26%;top:12%;pointer-events:none}
-.scene-canvas{display:block;width:100%;height:100%;filter:drop-shadow(0 38px 32px rgba(20,18,50,.18))}
-.hero-object>.scene-canvas{position:absolute;inset:0;pointer-events:auto}
+.aura{display:block;width:100%;height:100%;filter:drop-shadow(0 38px 32px rgba(20,18,50,.18))}
+.hero-object>.aura{position:absolute;inset:0;pointer-events:auto}
 .studio-ticker{height:50px;background:var(--ink);color:var(--paper);overflow:hidden;display:flex;align-items:center;font:10px 'DM Mono';letter-spacing:.08em;white-space:nowrap}
 .studio-ticker div{animation:ticker 22s linear infinite}
 @keyframes ticker{to{transform:translateX(-50%)}}
-.art>.scene-canvas{position:absolute;inset:0;z-index:2;filter:none}
-.project-card:hover .art>.scene-canvas{transform:none}
+.art>.aura{position:absolute;inset:0;z-index:2;filter:none}
+.project-card:hover .art>.aura{transform:none}
 .chrome-object,.ball,.watchman{display:none}
 .pedestal{z-index:1}.score{z-index:4}
 .agency{padding:100px 28px 130px;background:#d5d3ca}
@@ -54,7 +54,7 @@ footer{height:64px;background:#111;color:#eee;padding:0 28px;display:flex;align-
 .agency-title span{display:block}.agency-title span:nth-child(2){text-align:right}.agency-title em{font-family:Georgia,serif;font-weight:400}
 .agency-grid{display:grid;grid-template-columns:1.15fr .65fr .8fr;gap:7vw;align-items:start}
 .agency-3d{height:430px;background:#111;position:relative;overflow:hidden}
-.agency-3d .scene-canvas{position:absolute;inset:0}
+.agency-3d .aura{position:absolute;inset:0}
 .agency-3d b{position:absolute;left:16px;top:12px;color:white;font-size:36px;letter-spacing:-.08em}
 .agency-3d small{position:absolute;bottom:15px;right:15px;color:white;font:8px/1.4 'DM Mono';text-align:right}
 .agency-copy{font-size:17px;line-height:1.5}.agency-copy p{margin:0 0 30px}
@@ -76,3 +76,82 @@ footer{height:64px;background:#111;color:#eee;padding:0 28px;display:flex;align-
   .agency-3d{height:370px}
   .agency-copy{font-size:15px}
 }
+
+
+/* ============ PREMIUM PASS — degradados, grano y profundidad ============ */
+
+/* El papel deja de ser plano: luz cenital suave y caida hacia los bordes */
+body{background:
+  radial-gradient(1250px 720px at 78% -10%, #f7f5ef 0%, transparent 60%),
+  radial-gradient(950px 640px at 2% 30%, #f0ede4 0%, transparent 56%),
+  linear-gradient(180deg,#efece4 0%, var(--paper) 40%, #e2dfd4 100%);
+  background-attachment:fixed}
+
+/* Grano de pelicula global: lo que separa un render limpio de una pieza con cuerpo */
+body:after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:.045;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px}
+
+/* ---- AURA: el campo de degradado que sustituye a los canvas 3D ---- */
+.aura{pointer-events:none!important;overflow:hidden;filter:none!important;isolation:isolate}
+.aura i{position:absolute;display:block;border-radius:50%;filter:blur(40px);will-change:transform;backface-visibility:hidden}
+.aura i:nth-child(1){width:64%;aspect-ratio:1;left:6%;top:4%;animation:drift-a 21s ease-in-out infinite alternate}
+.aura i:nth-child(2){width:50%;aspect-ratio:1;right:2%;top:32%;animation:drift-b 26s ease-in-out infinite alternate}
+.aura i:nth-child(3){width:42%;aspect-ratio:1;left:24%;bottom:-6%;animation:drift-c 31s ease-in-out infinite alternate}
+@keyframes drift-a{to{transform:translate3d(8%,6%,0) scale(1.14)}}
+@keyframes drift-b{to{transform:translate3d(-10%,-5%,0) scale(.88)}}
+@keyframes drift-c{to{transform:translate3d(5%,-8%,0) scale(1.1)}}
+@media (prefers-reduced-motion:reduce){.aura i{animation:none}}
+
+/* Fondos claros -> soft-light: modula la luz sin ensuciar el color de marca */
+.aura-forma{mix-blend-mode:soft-light;opacity:.9}
+.aura-forma i:nth-child(1){background:#ffe2cd}
+.aura-forma i:nth-child(2){background:#4d1000}
+.aura-forma i:nth-child(3){background:#fff6ee}
+
+.aura-unfc{mix-blend-mode:soft-light;opacity:.9}
+.aura-unfc i:nth-child(1){background:#d8e5ff}
+.aura-unfc i:nth-child(2){background:#040a33}
+.aura-unfc i:nth-child(3){background:#a9d6ff}
+
+/* Fondos oscuros -> screen: la luz se suma, como un rebote real */
+.aura-ynv{mix-blend-mode:screen;opacity:.55}
+.aura-ynv i:nth-child(1){background:#7c4a00}
+.aura-ynv i:nth-child(2){background:#2b2b2b}
+.aura-ynv i:nth-child(3){background:#5e3a06}
+
+.aura-sereno{mix-blend-mode:screen;opacity:.65}
+.aura-sereno i:nth-child(1){background:#5c3d10}
+.aura-sereno i:nth-child(2){background:#132a52}
+.aura-sereno i:nth-child(3){background:#3b2b5e}
+
+/* Hero: esfera de luz en CSS. Cero geometria, cero coste. */
+.hero-object{filter:none}
+.aura-hero{opacity:1}
+.aura-hero i:nth-child(1){width:70%;left:12%;top:2%;filter:blur(12px);opacity:.95;
+  background:radial-gradient(circle at 34% 27%, #ffffff 0 4%, rgba(228,231,255,.95) 13%, rgba(132,141,240,.82) 36%, rgba(49,57,216,.62) 60%, rgba(16,18,66,.4) 78%, rgba(16,18,66,0) 88%)}
+.aura-hero i:nth-child(2){width:46%;right:4%;top:36%;background:var(--acid);opacity:.42;filter:blur(56px)}
+.aura-hero i:nth-child(3){width:44%;left:16%;bottom:0;background:#c6cbff;opacity:.6;filter:blur(52px)}
+.hero-object>.aura{pointer-events:none}
+
+/* Bloque del estudio */
+.aura-agency i:nth-child(1){width:72%;left:8%;top:6%;filter:blur(14px);opacity:.92;
+  background:radial-gradient(circle at 36% 30%, #ffffff 0 5%, #e6e2d6 34%, #3139d8 86%)}
+.aura-agency i:nth-child(2){width:44%;right:2%;bottom:8%;background:var(--acid);opacity:.35;filter:blur(50px)}
+.aura-agency i:nth-child(3){width:40%;left:20%;bottom:-4%;background:#b9bdf5;opacity:.5;filter:blur(46px)}
+
+/* ---- Profundidad de las cards: sombra proyectada + vinieta interior ---- */
+.art{box-shadow:0 34px 64px -34px rgba(28,22,14,.5), 0 1px 0 rgba(255,255,255,.06) inset}
+.art:after{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;mix-blend-mode:multiply;
+  background:radial-gradient(125% 100% at 50% 28%, transparent 40%, rgba(0,0,0,.3) 100%)}
+.project-card:hover .art{filter:contrast(1.03) saturate(1.04)}
+.art>*{transition:transform .65s cubic-bezier(.16,1,.3,1), filter .65s ease}
+
+/* Brillo especular que recorre la card al pasar el raton */
+.art:before{content:"";position:absolute;inset:0;z-index:7;pointer-events:none;opacity:0;transition:opacity .6s ease;
+  background:linear-gradient(115deg, transparent 38%, rgba(255,255,255,.16) 50%, transparent 62%)}
+.project-card:hover .art:before{opacity:1}
+
+/* Secciones oscuras con degradado en vez de negro plano */
+.manifesto{background:radial-gradient(120% 90% at 20% 0%, #1c1c1c 0%, #0d0d0d 55%, #060606 100%)}
+.contact{background:radial-gradient(110% 80% at 80% 100%, #17173a 0%, #0d0d0d 58%, #080808 100%)}

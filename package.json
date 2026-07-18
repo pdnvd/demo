@@ -13,8 +13,7 @@
     "vite": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "gsap": "latest",
-    "three": "latest"
+    "gsap": "latest"
   },
   "devDependencies": {}
 }
